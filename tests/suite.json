@@ -1,0 +1,5 @@
+{
+  "Id": "LPMS.LeastPrivilegedMSGraph",
+  "Name": "Least Privileged MSGraph",
+  "HelpUrlTemplate": "https://mynster-it.dk/docs/modules/leastprivilegedmsgraph"
+}

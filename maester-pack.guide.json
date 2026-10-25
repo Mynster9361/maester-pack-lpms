@@ -1,0 +1,84 @@
+{
+  "$schema": "https://maester.dev/schemas/maester-pack-guide-1.0.json",
+  "Summary": "Compares the Microsoft Graph permissions of every service principal with the API calls it actually made, from Microsoft Graph activity logs in Log Analytics, and reports excess permissions, unmatched calls, throttling and apps with no activity. The module's interactive permission analysis report is added to the Maester report under Reports.",
+  "Prerequisites": [
+    {
+      "Text": "The MicrosoftGraphActivityLogs diagnostic setting in Entra ID, sending to a Log Analytics workspace. Logs can take up to 48 hours to arrive after you turn it on.",
+      "More": "https://mynster-it.dk/2026/02/26/LeastPrivilegedMSGraphSetup"
+    },
+    {
+      "Text": "Monitoring Reader (or Reader) on the Log Analytics workspace, and Application.Read.All in Microsoft Graph, for the identity that runs Maester."
+    },
+    {
+      "Text": "The workspace ID in maester-config.json: GlobalSettings.LPMSLogAnalyticsWorkspaceId, or the LPMS_LOG_ANALYTICS_WORKSPACE_ID environment variable."
+    }
+  ],
+  "Connect": {
+    "Steps": [
+      {
+        "Text": "Connect Maester to Microsoft Graph",
+        "Command": "Connect-Maester"
+      },
+      {
+        "Text": "Sign in to Azure with the Log Analytics scope, which the pack's tests need",
+        "Command": "Connect-AzAccount -AuthScope 'https://api.loganalytics.io'"
+      }
+    ]
+  },
+  "Run": {
+    "Commands": [
+      {
+        "Text": "Only this pack",
+        "Command": "Invoke-Maester -Pack LPMS -SkipBuiltIn"
+      },
+      {
+        "Text": "Maester's tests and this pack",
+        "Command": "Invoke-Maester -Pack LPMS"
+      }
+    ],
+    "Options": [
+      {
+        "Name": "LPMSLogAnalyticsWorkspaceId",
+        "Default": "",
+        "Text": "Required. The Log Analytics workspace ID."
+      },
+      {
+        "Name": "LPMSDaysToQuery",
+        "Default": "30",
+        "Text": "Days of activity to analyse."
+      },
+      {
+        "Name": "LPMSMaxActivityEntries",
+        "Default": "100000",
+        "Text": "Most Log Analytics rows read per service principal."
+      },
+      {
+        "Name": "LPMSThrottleLimit",
+        "Default": "10",
+        "Text": "Parallel workers that read activity."
+      },
+      {
+        "Name": "LPMSOnlyPrivilegXAndOver",
+        "Default": "1",
+        "Text": "Only check permissions at this Microsoft privilege level or higher (1 to 5)."
+      },
+      {
+        "Name": "LPMSCacheMinutes",
+        "Default": "60",
+        "Text": "Minutes the analysis is reused in the same PowerShell session. 0 always refreshes."
+      }
+    ]
+  },
+  "AppOnly": {
+    "Supported": true,
+    "Methods": {
+      "Certificate": true,
+      "ClientSecret": true
+    },
+    "Text": "Sign in to Azure as the service principal or managed identity (Connect-AzAccount -ServicePrincipal or -Identity) and connect Microsoft Graph with Connect-MgGraph, then run Invoke-Maester -SkipGraphConnect. It needs Application.Read.All and Monitoring Reader on the workspace."
+  },
+  "Support": {
+    "Pack": "https://github.com/Mynster9361/maester-pack-lpms/issues",
+    "More": "https://mynster-it.dk/docs/modules/leastprivilegedmsgraph"
+  }
+}

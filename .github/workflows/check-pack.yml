@@ -1,0 +1,53 @@
+# Checks the pack on every push and pull request: the manifest and the content checks that Install-MtPack runs
+# (Test-MtPack), then every test once from this folder (Invoke-MtTest -Path). With no Azure connection the tests
+# are skipped; a test the engine cannot run (bad metadata, a wrong return value) fails the job.
+name: Check pack
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # bump-version.yml calls it on the commit that raises the version, which no push event checks.
+  workflow_call:
+    inputs:
+      ref:
+        description: The commit to check.
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Install Maester
+        run: Install-PSResource -Name Maester -Prerelease -TrustRepository -Quiet
+
+      - name: Check the pack
+        run: |
+          Import-Module Maester
+          $check = Test-MtPack .
+          $check | Format-List Id, Version, IsValid, Risk, Errors, Warnings, Findings
+          if (-not $check.IsValid) { throw 'The pack is not valid.' }
+          if ($check.Risk -eq 'High') { throw 'The content checks rate the pack High risk.' }
+
+      - name: Run the tests
+        run: |
+          Import-Module Maester
+          # Invoke-MtTest -Path loads the pack from this folder, so the pinned modules must be installed.
+          $modules = (Get-Content ./maester-pack.json -Raw | ConvertFrom-Json).Uses.Modules
+          foreach ($m in $modules) { Install-PSResource -Name $m.Name -Version $m.Version -TrustRepository -Quiet }
+          $results = @(Invoke-MtTest -Path .)
+          $results | Format-Table Id, Result, ReasonCode -AutoSize | Out-String -Width 200
+          $broken = @($results | Where-Object ReasonCode -In 'InvalidMetadata', 'InvalidReturn', 'InvalidConfiguration', 'InvalidInstanceId', 'LoadFailed')
+          if ($broken) { throw "The engine could not run $($broken.Count) test(s): $($broken.Id -join ', ')" }

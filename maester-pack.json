@@ -1,0 +1,49 @@
+{
+  "$schema": "https://maester.dev/schemas/maester-pack-1.0.json",
+  "Id": "mynster9361.least-privileged-msgraph",
+  "Guid": "920a26e8-a54c-46db-97b1-55e95f8ea934",
+  "Name": "Least Privileged MSGraph",
+  "Description": "Checks that service principals hold only the Microsoft Graph permissions their real API activity needs, using Microsoft Graph activity logs in Log Analytics.",
+  "Version": "1.0.0",
+  "Publisher": "mynster9361",
+  "License": "MIT",
+  "Homepage": "https://mynster-it.dk/docs/modules/leastprivilegedmsgraph",
+  "Support": "https://github.com/Mynster9361/maester-pack-lpms/issues",
+  "SecurityContact": "https://github.com/Mynster9361/maester-pack-lpms/security/advisories/new",
+  "RequiresMaester": ">=3.0",
+  "Code": "LPMS",
+  "Suites": [
+    "tests"
+  ],
+  "Helpers": [
+    "helpers"
+  ],
+  "Uses": {
+    "Services": [
+      "Azure"
+    ],
+    "GraphScopes": [
+      "Application.Read.All"
+    ],
+    "Network": [
+      "api.loganalytics.io",
+      "graph.microsoft.com"
+    ],
+    "Modules": [
+      {
+        "Name": "EntraAuth",
+        "Version": "1.8.56"
+      },
+      {
+        "Name": "LeastPrivilegedMSGraph",
+        "Version": "3.3.0"
+      }
+    ]
+  },
+  "Categories": [
+    "Entra ID",
+    "Applications",
+    "Least privilege"
+  ],
+  "Guide": "maester-pack.guide.json"
+}

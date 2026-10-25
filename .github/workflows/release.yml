@@ -1,0 +1,58 @@
+# Publishes a release for the version on main. After each push to main (a merged pull request), it reads Version
+# from maester-pack.json and, when there is no release v<Version> yet, tags that commit v<Version> and publishes a
+# release with the version's section of CHANGELOG.md as its notes. Install-MtPack installs the newest published
+# release once it is older than the install cooldown. A merge with release:none keeps the version, so it
+# publishes nothing. Run it by hand (workflow_dispatch) to publish the version on main if a run was missed.
+#
+# It runs only when the repository variable PACK_RELEASES is true, with bump-version.yml. Without it the pack has
+# no releases and Install-MtPack installs the default branch. See "Versions and releases" in README.md.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+
+jobs:
+  release:
+    if: vars.PACK_RELEASES == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Publish the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = [string](Get-Content -LiteralPath maester-pack.json -Raw | ConvertFrom-Json).Version
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Version '$version' in maester-pack.json is not major.minor.patch." }
+          $tag = "v$version"
+
+          gh release view $tag --json tagName 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "The release $tag already exists: nothing to publish."
+            $global:LASTEXITCODE = 0
+            return
+          }
+          $global:LASTEXITCODE = 0
+          if (git tag --list $tag) { throw "The tag $tag exists without a release. Delete the tag or raise the version." }
+
+          # The notes are the version's section of the changelog, up to the next "## " heading.
+          $log = Get-Content -LiteralPath CHANGELOG.md -Raw
+          $section = [regex]::Match($log, '(?ms)^## ' + [regex]::Escape($version) + '[ \t]*\r?\n(.*?)(?=^## |\z)')
+          $notes = if ($section.Success -and $section.Groups[1].Value.Trim()) { $section.Groups[1].Value.Trim() } else { "Version $version." }
+          $notesFile = Join-Path $env:RUNNER_TEMP 'notes.md'
+          [System.IO.File]::WriteAllText($notesFile, $notes + "`n")
+
+          gh release create $tag --target (git rev-parse HEAD) --title $tag --notes-file $notesFile --latest
+          if ($LASTEXITCODE -ne 0) { throw "Could not publish $tag." }
+          "Published **$tag**." >> $env:GITHUB_STEP_SUMMARY
