@@ -4,7 +4,7 @@
   "Guid": "920a26e8-a54c-46db-97b1-55e95f8ea934",
   "Name": "Least Privileged MSGraph",
   "Description": "Checks that service principals hold only the Microsoft Graph permissions their real API activity needs, using Microsoft Graph activity logs in Log Analytics.",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "Publisher": "Mynster9361",
   "License": "MIT",
   "Homepage": "https://mynster-it.dk/docs/modules/leastprivilegedmsgraph",
