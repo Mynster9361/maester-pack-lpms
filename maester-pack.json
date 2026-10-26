@@ -5,7 +5,7 @@
   "Name": "Least Privileged MSGraph",
   "Description": "Checks that service principals hold only the Microsoft Graph permissions their real API activity needs, using Microsoft Graph activity logs in Log Analytics.",
   "Version": "1.0.0",
-  "Publisher": "mynster9361",
+  "Publisher": "Mynster9361",
   "License": "MIT",
   "Homepage": "https://mynster-it.dk/docs/modules/leastprivilegedmsgraph",
   "Support": "https://github.com/Mynster9361/maester-pack-lpms/issues",
@@ -20,7 +20,7 @@
   ],
   "Uses": {
     "Services": [
-      "Azure"
+      "Azure Log Analytics, Graph"
     ],
     "GraphScopes": [
       "Application.Read.All"

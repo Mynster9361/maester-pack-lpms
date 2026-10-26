@@ -1,0 +1,20 @@
+# Checks the pack the way Maester does when someone installs it. Written by the pack builder on packs.maester.cloud.
+name: Test pack
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test-MtPack
+        shell: pwsh
+        run: |
+          Install-Module Maester -Scope CurrentUser -Force -AllowPrerelease
+          Import-Module Maester
+          $result = Test-MtPack -Path .
+          $result | Format-List | Out-String | Write-Host
+          if (-not $result.IsValid) { throw 'Test-MtPack found problems. Fix them before you release the pack.' }
