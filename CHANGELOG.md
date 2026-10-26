@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- metadata (#1)
+
 ## 1.0.0
 
 - First release as a Maester Pack (`mynster9361.least-privileged-msgraph`, code `LPMS`).
