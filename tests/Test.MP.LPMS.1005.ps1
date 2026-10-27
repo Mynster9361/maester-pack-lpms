@@ -25,7 +25,7 @@ function Test-LPMSPermissionAnalysisReport {
         Severity     = 'Info',
         Mitre        = 'None',
         Service      = 'Azure',
-        Permission   = 'Application.Read.All',
+        Permission   = 'Graph:Scope:Application.Read.All',
         Author       = 'Mynster9361',
         HelpUrl      = 'https://mynster-it.dk/docs/modules/leastprivilegedmsgraph'
     )]

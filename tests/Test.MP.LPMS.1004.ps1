@@ -52,7 +52,7 @@ function Test-LPMSNoActivity {
         Mitre              = ('T1078.004', 'T1098.001'),
         Control            = 'nist-800-53-r5:AC-2(3)',
         Service            = 'Azure',
-        Permission         = 'Application.Read.All',
+        Permission         = 'Graph:Scope:Application.Read.All',
         InstanceSource     = 'Get-LPMSNoActivityInstance',
         Author             = 'Mynster9361',
         HelpUrl            = 'https://mynster-it.dk/docs/modules/leastprivilegedmsgraph'
