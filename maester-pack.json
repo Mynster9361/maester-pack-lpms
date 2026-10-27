@@ -20,7 +20,7 @@
   ],
   "Uses": {
     "Services": [
-      "Azure Log Analytics, Graph"
+      "Azure"
     ],
     "GraphScopes": [
       "Application.Read.All"
@@ -45,5 +45,6 @@
     "Applications",
     "Least privilege"
   ],
+  "Banner": "assets/banner.jpg",
   "Guide": "maester-pack.guide.json"
 }
